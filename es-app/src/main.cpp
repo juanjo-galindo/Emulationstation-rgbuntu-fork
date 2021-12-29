@@ -379,6 +379,8 @@ bool loadSystemConfigFile(Window* window, const char** errorString)
 
 		return false;
 	}
+    SystemData::generatePlaylistsDefaults();
+	Settings::getInstance()->saveFile();
 
 	return true;
 }
@@ -391,11 +393,25 @@ void onExit()
 
 void processAudioTitles(Window* window)
 {
-	if (Settings::getInstance()->getBool("MusicTitles"))
+	if (Settings::getInstance()->getBool("MusicInfo"))
 	{
-		std::string songName = AudioManager::getInstance()->popSongName();
-		if (!songName.empty())
-			window->displayNotificationMessage(_U("\uF028  ") + songName);
+        if (Settings::getInstance()->getString("MusicInfoModes") == "Title") {
+            //Juanjo:  Original
+		    std::string songName = AudioManager::getInstance()->popSongName();
+		    if (!songName.empty())
+		    	window->displayNotificationMessage(songName);
+        }
+        if (Settings::getInstance()->getString("MusicInfoModes") == "Path") {
+            //Juanjo:  Test purposes
+		    std::string musicPath= AudioManager::getInstance()->popMusicPath();
+		    if (!musicPath.empty())
+		    	window->displayNotificationMessage(musicPath);
+	    }
+        //if (Settings::getInstance()->getString("MusicInfoModes") == "TEST") {
+		//    std::string testName = AudioManager::getInstance()->popTestString();
+		//    if (!testName.empty())
+		//    	window->displayNotificationMessage(_U("\uF028  ") + testName);
+	    //}
 	}
 }
 
@@ -562,8 +578,14 @@ int main(int argc, char* argv[])
 
 	window.endRenderLoadingScreen();
 
-	if (Settings::getInstance()->getBool("audio.bgmusic"))
-		AudioManager::getInstance()->playRandomMusic();
+	//if (Settings::getInstance()->getBool("audio.bgmusic")) {
+	//	AudioManager::getInstance()->playRandomMusic();
+	//	//AudioManager::getInstance()->themeChanged(getSelected()->getTheme(), true);
+    //}
+	if (Settings::getInstance()->getBool("audio.bgmusic")) {
+	    //ViewController::get()->reloadAll();
+        AudioManager::getInstance()->themeChanged(ViewController::get()->getState().getSystem()->getTheme(), false); 
+    }
 
 #ifdef WIN32	
 	DWORD displayFrequency = 60;

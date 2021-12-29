@@ -134,6 +134,7 @@ public:
 	static bool hasDirtySystems();
 	static void deleteSystems();
 	static bool loadConfig(Window* window); //Load the system config file at getConfigPath(). Returns true if no errors were encountered. An example will be written if the file doesn't exist.
+    static void generatePlaylistsDefaults(); //JGM
 	static void writeExampleConfig(const std::string& path);
 	static std::string getConfigPath(bool forWrite); // if forWrite, will only return ~/.emulationstation/es_systems.cfg, never /etc/emulationstation/es_systems.cfg
 

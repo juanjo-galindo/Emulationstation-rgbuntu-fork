@@ -558,6 +558,7 @@ bool SystemData::loadConfig(Window* window)
 		createGroupedSystems();
 		CollectionSystemManager::get()->loadCollectionSystems();
 	}
+    //generatePlaylistsDefaults();
 
 	if (SystemData::sSystemVector.size() > 0)
 	{
@@ -566,6 +567,30 @@ bool SystemData::loadConfig(Window* window)
 	}
 
 	return true;
+}
+
+void SystemData::generatePlaylistsDefaults()
+{
+	for (auto system : SystemData::sSystemVector)
+	{
+		if (system->isCollection())
+			continue;
+
+		if (system->getSystemEnvData()->mEmulators.size() == 0)
+			continue;
+
+		if (system->getSystemEnvData()->mEmulators.size() == 1 && system->getSystemEnvData()->mEmulators[0].mCores.size() <= 1)
+			continue;
+		
+        //Settings::getInstance()->setString(std::string("MusicList_") + system->getName().c_str(), std::string("/home/arcade/.emulationstation/music"));
+        //Settings::getInstance()->setString(std::string("MusicList_") + system->getFullName().c_str(), std::string("/home/arcade/.emulationstation/music"));
+        std::string playlistFolderName = Settings::getInstance()->getString(std::string("PlaylistFolder_") + system->getThemeFolder().c_str() );
+
+        //Set default playlist path only when is not already defined 
+        if ( playlistFolderName == "" )
+            Settings::getInstance()->setString(std::string("PlaylistFolder_") + system->getThemeFolder().c_str(), std::string("/home/arcade/.emulationstation/music"));
+	}
+
 }
 
 void SystemData::writeExampleConfig(const std::string& path)

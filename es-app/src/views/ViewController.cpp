@@ -22,6 +22,15 @@
 
 ViewController* ViewController::sInstance = NULL;
 
+void ViewController::setSoundSystem(SystemData* updatedSoundSystem)
+{
+	soundSystem = updatedSoundSystem ;
+}
+SystemData* ViewController::getSoundSystem()
+{
+	return soundSystem;
+}
+
 ViewController* ViewController::get()
 {
 	assert(sInstance);
@@ -91,6 +100,7 @@ int ViewController::getSystemId(SystemData* system)
 
 void ViewController::goToSystemView(SystemData* system, bool forceImmediate)
 {
+    soundSystem = system;
 	// Tell any current view it's about to be hidden
 	if (mCurrentView)
 	{
@@ -135,8 +145,17 @@ void ViewController::goToPrevGameList()
 	AudioManager::getInstance()->themeChanged(system->getTheme());
 }
 
+void ViewController::ReloadSoundSystem(bool force)
+{
+	SystemData* system = getState().getSystem();
+	assert(system);
+    //mWindow->displayNotificationMessage(soundSystem->getFullName() );
+	AudioManager::getInstance()->themeChanged(soundSystem->getTheme(), force);
+}
+
 void ViewController::goToGameList(SystemData* system, bool forceImmediate)
 {
+    soundSystem = system;
 	if(mState.viewing == SYSTEM_SELECT)
 	{
 		// move system list

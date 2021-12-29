@@ -17,8 +17,11 @@ GuiInfoPopup::GuiInfoPopup(Window* window, std::string message, int duration) :
 
 	std::shared_ptr<TextComponent> s = std::make_shared<TextComponent>(mWindow,
 		"",
-		Font::get(FONT_SIZE_MINI),
+		//Font::get(FONT_SIZE_MINI),
+		Font::get(FONT_SIZE_SMALL),
+		//Font::get(FONT_SIZE_LARGE),
 		theme->Text.color, //0x444444FF,
+		//0xFFFFFFFF,  //JGM Blanco
 		ALIGN_CENTER);
 
 	// we do this to force the text container to resize and return an actual expected popup size
@@ -54,16 +57,26 @@ GuiInfoPopup::GuiInfoPopup(Window* window, std::string message, int duration) :
 	mFrame->setImagePath(theme->Background.path);
 	mFrame->setCenterColor(mBackColor);
 	mFrame->setEdgeColor(mBackColor);
+
+	//mFrame->setCenterColor(0x00000000 | (unsigned char)(alpha));
+	//mFrame->setEdgeColor(0x00000000 | (unsigned char)(alpha));
+
+
+
 	mFrame->setCornerSize(theme->Background.cornerSize);
 	mFrame->fitTo(mSize, Vector3f::Zero(), Vector2f(-32, -32));
-	addChild(mFrame);
+	addChild(mFrame); //JGM comentar para quitar cuadro de fondo bajo texto
 
 	// we only init the actual time when we first start to render
 	mStartTime = 0;
 
-	mGrid = new ComponentGrid(window, Vector2i(1, 3));
-	mGrid->setSize(mSize);
-	mGrid->setEntry(s, Vector2i(0, 1), false, true);
+	mGrid = new ComponentGrid(window, Vector2i(1, 3));  // JGM Testing  
+	mGrid->setSize(mSize);                              // JGM Testing  
+	mGrid->setEntry(s, Vector2i(0, 1), false, true);    // JGM Testing  
+	//mGrid = new ComponentGrid(window, Vector2i(1, 1));    // JGM Testing 
+	//mGrid->setSize(mSize);                                // JGM Testing 
+	//mGrid->setEntry(s, Vector2i(0, 0), false, true);      // JGM Testing 
+
 	addChild(mGrid);
 }
 
@@ -117,11 +130,25 @@ bool GuiInfoPopup::updateState()
 	{
 		alpha = ((-(curTime - mStartTime - mDuration)*255)/500);
 	}
-
+    
 	if (alpha > mBackColor & 0xff)
 		alpha = mBackColor & 0xff;
 
 	mGrid->setOpacity((unsigned char)alpha);
+
+    //Fading mFrame JGM
+	alpha = 200;
+	if (curTime - mStartTime <= 2500) {
+		alpha = ((curTime - mStartTime)*200/2500);
+	}
+	else if (curTime - mStartTime < mDuration - 2500)
+	{
+		alpha = 200;
+	}
+	else
+	{
+		alpha = ((-(curTime - mStartTime - mDuration)*200)/2500);
+	}
 
 	// apply fade in effect to popup frame
 	mFrame->setEdgeColor((mBackColor & 0xffffff00) | (unsigned char)(alpha));

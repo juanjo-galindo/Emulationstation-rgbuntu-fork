@@ -35,8 +35,15 @@ private:
 	void openUISettings();
 	void openUpdateSettings();
 	void openEmulatorSettings();
+	void openPerSystemsPlaylistSettings();
+	void openPerFolderPlaylistSettings();
+	void openSystemSpecificMusicFolderSettings();
+    void openShowPlaylistFolders();
+    void openShowPlaylistFolderContent(std::string folder);
 	void openSystemEmulatorSettings(SystemData* system);
-
+	void openSystemPlaylistsSettings(SystemData* system);
+	void openFolderPlaylistsSettings(std::string folder);
+	void openSystemPlaylistsSelection(SystemData* system);
 	void createInputTextRow(GuiSettings *gui, std::string title, const char *settingsID, bool password);
 
 	MenuComponent mMenu;

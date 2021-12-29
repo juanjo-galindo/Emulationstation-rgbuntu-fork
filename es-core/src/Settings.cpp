@@ -102,8 +102,11 @@ void Settings::setDefaults()
 	mBoolMap["SaveGamelistsOnExit"] = true;
 	mBoolMap["OptimizeVRAM"] = true;	
 	mBoolMap["ThreadedLoading"] = true;	
-	mBoolMap["MusicTitles"] = true;
-
+	mBoolMap["MusicInfo"] = true;
+	mBoolMap["RandomMusicList"] = true;
+	mBoolMap["EnablePlaybackControl"] = true;
+	mBoolMap["PlaybackControlNotified"] = false;
+ 
 	mBoolMap["Debug"] = false;
 	mBoolMap["DebugGrid"] = false;
 	mBoolMap["DebugText"] = false;
@@ -223,15 +226,17 @@ void Settings::setDefaults()
 	mBoolMap["ScrapeVideos"] = false;
 	
 	mBoolMap["audio.bgmusic"] = true;
-	mBoolMap["audio.persystem"] = false;
-	mBoolMap["audio.thememusics"] = true;
+	mBoolMap["audio.persystem"] = false; 
+	//mBoolMap["audio.thememusics"] = true;
 	
 	mStringMap["MusicDirectory"] = "";
 	mStringMap["UserMusicDirectory"] = "";
+	mStringMap["MusicInfoModes"] = "Title";
 
 	mBoolMap["updates.enabled"] = true;
 	
 	mBoolMap["DrawClock"] = true;
+
 
 	mDefaultBoolMap = mBoolMap;
 	mDefaultIntMap = mIntMap;
@@ -289,6 +294,7 @@ bool Settings::saveFile()
 		if (def == mDefaultStringMap.cend() && iter->second.empty())
 			continue;
 
+        // if key value is the same as in default string map, do nothing, return
 		if (def != mDefaultStringMap.cend() && def->second == iter->second)
 			continue;
 		

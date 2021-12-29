@@ -390,6 +390,15 @@ public:
 		return false;
 	}
 
+	int getSelNum()
+	{
+		for (unsigned int i = 0; i < mEntries.size(); i++)
+			if (mEntries.at(i).selected)
+				return i+1;
+
+		return 0;
+	}
+
 	void selectFirstItem()
 	{
 		for (unsigned int i = 0; i < mEntries.size(); i++)
@@ -397,6 +406,17 @@ public:
 
 		if (mEntries.size() > 0)
 			mEntries.at(0).selected = true;
+
+		onSelectedChanged();
+	}
+
+	void selectSecondItem()
+	{
+		for (unsigned int i = 0; i < mEntries.size(); i++)
+			mEntries.at(i).selected = false;
+
+		if (mEntries.size() > 0)
+			mEntries.at(1).selected = true;
 
 		onSelectedChanged();
 	}

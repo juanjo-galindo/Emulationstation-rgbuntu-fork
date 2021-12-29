@@ -39,6 +39,8 @@ public:
 	void goToStart(bool forceImmediate = false);
 	void ReloadAndGoToStart();
 
+    void ReloadSoundSystem(bool force=false);
+
 	void onFileChanged(FileData* file, FileChangeType change);
 
 	// Plays a nice launch effect and launches the game at the end of it.
@@ -77,6 +79,9 @@ public:
 		friend ViewController;
 		SystemData* system;
 	};
+    SystemData* soundSystem;
+    SystemData* getSoundSystem();
+    void setSoundSystem(SystemData* updatedSoundSystem);
 
 	inline const State& getState() const { return mState; }
 

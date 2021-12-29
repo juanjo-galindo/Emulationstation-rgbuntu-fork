@@ -340,7 +340,7 @@ namespace Utils
 #endif // _WIN32
 
 			}
-
+            contentList.sort();
 			// return the content list
 			return contentList;
 

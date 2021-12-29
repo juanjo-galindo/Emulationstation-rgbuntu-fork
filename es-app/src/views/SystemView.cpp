@@ -438,6 +438,34 @@ bool SystemView::input(InputConfig* config, Input input)
 			setCursor(SystemData::getRandomSystem());
 			return true;
 		}
+
+        if (Settings::getInstance()->getBool("EnablePlaybackControl")) {
+			if (config->isMappedLike("up", input) && mCarousel.type!=VERTICAL_WHEEL)
+			{
+	            AudioManager::getInstance()->increaseListPosition();
+		        AudioManager::getInstance()->themeChanged(getSelected()->getTheme(), true);
+				return true;    
+			}
+			if (config->isMappedLike("right", input) && mCarousel.type==VERTICAL_WHEEL)
+			{
+	            AudioManager::getInstance()->increaseListPosition();
+		        AudioManager::getInstance()->themeChanged(getSelected()->getTheme(), true);
+				return true;    
+			}
+			if (config->isMappedLike("down", input) && mCarousel.type!=VERTICAL_WHEEL) 
+			{
+	            AudioManager::getInstance()->decreaseListPosition();
+		        AudioManager::getInstance()->themeChanged(getSelected()->getTheme(), true);
+				return true;
+			}
+			if (config->isMappedLike("left", input) && mCarousel.type==VERTICAL_WHEEL) 
+			{
+	            AudioManager::getInstance()->decreaseListPosition();
+		        AudioManager::getInstance()->themeChanged(getSelected()->getTheme(), true);
+				return true;
+			}
+        }
+
 	}else{
 		if(config->isMappedLike("left", input) ||
 			config->isMappedLike("right", input) ||
@@ -466,6 +494,9 @@ void SystemView::update(int deltaTime)
 
 void SystemView::onCursorChanged(const CursorState& /*state*/)
 {
+	ViewController::get()->soundSystem = getSelected();
+    //ViewController::get()->setSoundSystem(getSelected());
+
 	if (mLastSystem != getSelected()) {
 		mLastSystem = getSelected();
 		AudioManager::getInstance()->themeChanged(getSelected()->getTheme());
@@ -526,7 +557,8 @@ void SystemView::onCursorChanged(const CursorState& /*state*/)
 		else
 		{
 			char strbuf[256];
-			snprintf(strbuf, 256, EsLocale::nGetText("%i GAME AVAILABLE", "%i GAMES AVAILABLE", gameCount).c_str(), gameCount);
+			//snprintf(strbuf, 256, EsLocale::nGetText("%i GAMEAVAILABLE", "%i GAMES AVAILABLE", gameCount).c_str(), gameCount);
+			snprintf(strbuf, 256, EsLocale::nGetText("%i GAME", "%i GAMES", gameCount).c_str(), gameCount);
 			ss << strbuf;
 		}
 	

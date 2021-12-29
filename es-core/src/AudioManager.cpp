@@ -8,6 +8,8 @@
 #include "utils/FileSystemUtil.h"
 #include "utils/StringUtil.h"
 
+#include <random>
+
 #ifdef WIN32
 #include <time.h>
 #else
@@ -17,7 +19,7 @@
 std::vector<std::shared_ptr<Sound>> AudioManager::sSoundVector;
 std::shared_ptr<AudioManager> AudioManager::sInstance;
 
-AudioManager::AudioManager() : mCurrentMusic(NULL), mInitialized(false), mMusicVolume(MIX_MAX_VOLUME), mVideoPlaying(false)
+AudioManager::AudioManager() : mCurrentMusic(NULL), mInitialized(false), mMusicVolume(MIX_MAX_VOLUME), mVideoPlaying(false), mForceRandomization(true)
 {	
 	init();
 }
@@ -68,6 +70,8 @@ void AudioManager::init()
 		for (unsigned int i = 0; i < sSoundVector.size(); i++)
 			sSoundVector[i]->init();
 	}
+    mCurrentRealThemeMusicDirectory  = "EMPTY"; 
+    mPreviousRealThemeMusicDirectory = "EMPTY"; 
 }
 
 void AudioManager::deinit()
@@ -132,7 +136,11 @@ void AudioManager::findMusic(const std::string &path, std::vector<std::string>& 
 	if (!Utils::FileSystem::isDirectory(path))
 		return;
 	
-	bool anySystem = !Settings::getInstance()->getBool("audio.persystem");
+    //Juanjo : He anulado esta función. Ya esta implicita en la estructura de carpetas que voy a 
+    //         crear y en los links simbolicos. La forma anterior no permite compartir audios y 
+    //         dejar una lista default de forma sencilla.
+	//bool anySystem = !Settings::getInstance()->getBool("audio.persystem");
+	bool findSubfolders= true;
 
 	auto dirContent = Utils::FileSystem::getDirContent(path);
 	for (auto it = dirContent.cbegin(); it != dirContent.cend(); ++it) 
@@ -142,7 +150,8 @@ void AudioManager::findMusic(const std::string &path, std::vector<std::string>& 
 			if (*it == "." || *it == "..")
 				continue;
 
-			if (anySystem || mSystemName == Utils::FileSystem::getFileName(*it))
+			//if (anySystem || mSystemName == Utils::FileSystem::getFileName(*it))
+			if (findSubfolders)
 				findMusic(*it, all_matching_files);
 		}
 		else 
@@ -154,7 +163,7 @@ void AudioManager::findMusic(const std::string &path, std::vector<std::string>& 
 	}
 }
 
-void AudioManager::playRandomMusic(bool continueIfPlaying) 
+void AudioManager::playRandomMusic(bool continueIfPlaying, bool force) 
 {
 	if (!mInitialized)
 		return;
@@ -174,26 +183,119 @@ void AudioManager::playRandomMusic(bool continueIfPlaying)
 		findMusic(Settings::getInstance()->getString("MusicDirectory"), musics);
 
 	// check in .emulationstation/music directory
-	if (musics.empty())
-		findMusic(Utils::FileSystem::getHomePath() + "/.emulationstation/music", musics);
-			
+	if (musics.empty()) {
+		//findMusic(Utils::FileSystem::getHomePath() + "/.emulationstation/music", musics);
+	    mCurrentThemeMusicDirectory = Utils::FileSystem::getHomePath() + "/.emulationstation/music";
+		findMusic(mCurrentThemeMusicDirectory, musics);
+	}
 	if (musics.empty()) 
 		return;
-	
+
+    int char_sz = mCurrentThemeMusicDirectory.length();
+    char path_char_array[char_sz+1];
+    strcpy(path_char_array,mCurrentThemeMusicDirectory.c_str());
+    // Get rid of symbolic links to identify real path from /
+	char * thisRealPath =  realpath(path_char_array,0); 	
+
+    mCurrentRealThemeMusicDirectory  = std::string( thisRealPath );	 
+	mMusicPathInfo= mCurrentRealThemeMusicDirectory ;	
+	free(thisRealPath);
+    if (!force && mCurrentRealThemeMusicDirectory == mPreviousRealThemeMusicDirectory)  
+	   return;
+
+    if (mCurrentRealThemeMusicDirectory != mPreviousRealThemeMusicDirectory) { 
+        mPlayListItemIncrease = true;
+        mPlayListItemDecrease = true;
+        mPlayListItemPos = 0;
+        mPreviousRealThemeMusicDirectory = mCurrentRealThemeMusicDirectory;
+        mForceRandomization = true;
+    }
+
+    // continue playing ?
+    if (mCurrentMusic != NULL && continueIfPlaying) 
+    	return;
+
+    std::string itemToBePlayed;                  
+	if (Settings::getInstance()->getBool("RandomMusicList")) {
+
+        //Randomize Index list if system has changed or forced
+        if (mForceRandomization) 
+        {
+            mForceRandomization = false;
 #if defined(WIN32)
-	srand(time(NULL) % getpid());
+    	    srand(time(NULL) % getpid());
 #else
-	srand(time(NULL) % getpid() + getppid());
+    	    srand(time(NULL) % getpid() + getppid());
 #endif
+            //Generate Index list
+            randomPosList.resize(musics.size());
+            for (int i=0; i<musics.size(); ++i) 
+                randomPosList.at(i) = i;
 
-	int randomIndex = rand() % musics.size();
+            //Randomize Index list
+            int n = randomPosList.size();
+            for (int i = 0; i < n - 1; i++)
+            {
+                int j = i + rand() % (n - i);
+                std::swap(randomPosList[i], randomPosList[j]);
+            }
+        }
 
-	// continue playing ?
-	if (mCurrentMusic != NULL && continueIfPlaying) 
-		return;
+        if (mPlayListItemIncrease){
+            if (mPlayListItemPos == musics.size()-1)
+                mPlayListItemPos = 0;
+            else
+                mPlayListItemPos++;
 
-	playMusic(musics.at(randomIndex));
+            mPlayListItemIncrease = false;
+        }
+        if (mPlayListItemDecrease){
+            if (mPlayListItemPos == 0)
+                mPlayListItemPos = musics.size()-1;
+            else
+                mPlayListItemPos--;
+
+            mPlayListItemDecrease = false;
+        }
+        //mTestString = std::to_string(mPlayListItemPos);
+        //itemToBePlayed = musics[randomPosList.at(mPlayListItemPos)];
+        itemToBePlayed = musics[randomPosList[mPlayListItemPos]];
+
+    } else {    
+        mForceRandomization = true;
+        if (mPlayListItemIncrease){
+            if (mPlayListItemPos == musics.size()-1)
+                mPlayListItemPos = 0;
+            else
+                mPlayListItemPos++;
+
+            mPlayListItemIncrease = false;
+        }
+        if (mPlayListItemDecrease){
+            if (mPlayListItemPos == 0)
+                mPlayListItemPos = musics.size()-1;
+            else
+                mPlayListItemPos--;
+
+            mPlayListItemDecrease = false;
+        }
+        //mTestString = std::to_string(mPlayListItemPos);
+        itemToBePlayed = musics[mPlayListItemPos];
+    }
+
+	//playMusic(musics.at(randomIndex));
+	playMusic(itemToBePlayed);
 	mRunningFromPlaylist = true;
+}
+
+void AudioManager::increaseListPosition() 
+{
+  mPlayListItemIncrease = true;
+} 
+
+void AudioManager::decreaseListPosition() 
+{
+  mPlayListItemDecrease = true;
 }
 
 void AudioManager::playMusic(std::string path)
@@ -220,12 +322,15 @@ void AudioManager::playMusic(std::string path)
 
 	Mix_HookMusicFinished(AudioManager::onMusicFinished);
 	mCurrentMusicPath = path;
+
 	mCurrentSong = Utils::FileSystem::getStem(path);
 }
 
 void AudioManager::onMusicFinished() 
 {
-	AudioManager::getInstance()->playRandomMusic(false);
+    //Force playing music when music has stopped
+	AudioManager::getInstance()->increaseListPosition();
+	AudioManager::getInstance()->playRandomMusic(false, true);
 }
 
 void AudioManager::stopMusic() 
@@ -241,27 +346,41 @@ void AudioManager::stopMusic()
 	mCurrentMusic = NULL;	
 }
 
-void AudioManager::themeChanged(const std::shared_ptr<ThemeData>& theme, bool force)
+void AudioManager::themeChanged(const std::shared_ptr<ThemeData>& theme, bool force, bool savedTheme)
 {
+	if (!savedTheme)
+        lastTheme = theme;	
+
 	if (!force && mSystemName == theme->getSystemThemeFolder())
 		return;
 
 	mSystemName = theme->getSystemThemeFolder();
-	mCurrentThemeMusicDirectory = "";
+	//mCurrentThemeMusicDirectory = "";
 
 	if (!Settings::getInstance()->getBool("audio.bgmusic"))
 		return;
-	
-	const ThemeData::ThemeElement* elem = theme->getElement("system", "directory", "sound");
+    else
+	    mCurrentThemeMusicDirectory = "";
 
-	if (Settings::getInstance()->getBool("audio.thememusics"))
+	const ThemeData::ThemeElement* elem ;
+	if (savedTheme)
+	    elem = lastTheme->getElement("system", "directory", "sound");
+    else
+	    elem = theme->getElement("system", "directory", "sound");
+
+	if (Settings::getInstance()->getBool("audio.persystem"))
 	{
-		if (elem && elem->has("path"))
-			mCurrentThemeMusicDirectory = elem->get<std::string>("path");
+		//if (elem && elem->has("path")){
+		//	mCurrentThemeMusicDirectory = elem->get<std::string>("path");
+        //}
+		mCurrentThemeMusicDirectory = Settings::getInstance()->getString(std::string("PlaylistFolder_") + mSystemName );
 
 		std::string bgSound;
 
-		elem = theme->getElement("system", "bgsound", "sound");
+	    if (savedTheme)
+		    elem = lastTheme->getElement("system", "bgsound", "sound");
+        else
+		    elem = theme->getElement("system", "bgsound", "sound");
 		if (elem && elem->has("path") && Utils::FileSystem::exists(elem->get<std::string>("path")))
 		{
 			bgSound = Utils::FileSystem::getCanonicalPath(elem->get<std::string>("path"));
@@ -272,7 +391,18 @@ void AudioManager::themeChanged(const std::shared_ptr<ThemeData>& theme, bool fo
 		// Found a music for the system
 		if (!bgSound.empty())
 		{
+            //Just in case
+            mPreviousRealThemeMusicDirectory = bgSound;
 			mRunningFromPlaylist = false;
+
+            //Save music path for bgsound files
+            int char_sz = bgSound.length();
+            char path_char_array[char_sz+1];
+            strcpy(path_char_array,bgSound.c_str());
+            // Get rid of symbolic links to identify real path from /
+	        char * thisRealPath =  realpath(path_char_array,0); 	
+	        mMusicPathInfo= std::string( thisRealPath );	  
+
 			playMusic(bgSound);
 			return;
 		}
@@ -280,8 +410,8 @@ void AudioManager::themeChanged(const std::shared_ptr<ThemeData>& theme, bool fo
 
 
 	mSystemName = theme->getSystemThemeFolder();
-	if (!mRunningFromPlaylist || Settings::getInstance()->getBool("audio.persystem"))
-		playRandomMusic(false);	
+	playRandomMusic(false, force);	
+    
 }
 
 void AudioManager::setVideoPlaying(bool state)

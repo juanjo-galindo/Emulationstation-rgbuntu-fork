@@ -88,6 +88,7 @@ public:
 	void renderScreenSaver();
 
 	void displayNotificationMessage(std::string message, int duration = -1);
+	void displayAudioMessage(std::string message, int duration = -1);
 
 	void registerNotificationComponent(AsyncNotificationComponent* pc);
 	void unRegisterNotificationComponent(AsyncNotificationComponent* pc);
