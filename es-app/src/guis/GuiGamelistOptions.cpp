@@ -250,14 +250,20 @@ GuiGamelistOptions::GuiGamelistOptions(Window* window, SystemData* system, bool 
 	folders.push_back("never");
 	folders.push_back("having multiple games");
 
+    std::string currentFolderViewMode = Settings::getInstance()->getString(_("FolderViewMode_")+system->getName().c_str());
+    if (currentFolderViewMode == std::string("")) 
+        currentFolderViewMode = Settings::getInstance()->getString("FolderViewMode");
+
 	for (auto it = folders.cbegin(); it != folders.cend(); it++)
-		foldersBehavior->add(_(it->c_str()), *it, Settings::getInstance()->getString("FolderViewMode") == *it);
+		foldersBehavior->add(_(it->c_str()), *it, currentFolderViewMode == *it);
 	
 	mMenu.addWithLabel(_("SHOW FOLDERS"), foldersBehavior);
-	addSaveFunc([this, foldersBehavior] 
+	addSaveFunc([this, system, foldersBehavior] 
 	{
-		if (Settings::getInstance()->setString("FolderViewMode", foldersBehavior->getSelected()))
-			mReloadAll = true;
+		//if (Settings::getInstance()->setString("FolderViewMode", foldersBehavior->getSelected()))
+		//	mReloadAll = true;
+        if (Settings::getInstance()->setString(_("FolderViewMode_")+system->getName().c_str(), foldersBehavior->getSelected()))
+		    mReloadAll = true;
 	});
 
 	std::map<std::string, CollectionSystemData> customCollections = CollectionSystemManager::get()->getCustomCollectionSystems();

@@ -403,8 +403,14 @@ const std::string CollectionFileData::getName()
 const std::vector<FileData*> FolderData::getChildrenListToDisplay() 
 {
 	std::vector<FileData*> ret;
+  //Orig
+  //std::string showFoldersMode = Settings::getInstance()->getString("FolderViewMode");
 
-	std::string showFoldersMode = Settings::getInstance()->getString("FolderViewMode");
+	std::string showFoldersMode = Settings::getInstance()->getString(std::string("FolderViewMode_")+std::string(mSystem->getName().c_str()));
+	if (showFoldersMode == std::string(""))
+	{
+        showFoldersMode = Settings::getInstance()->getString("FolderViewMode");
+	}
 	
 	bool showHiddenFiles = Settings::getInstance()->getBool("ShowHiddenFiles");
 	bool filterKidGame = false;
