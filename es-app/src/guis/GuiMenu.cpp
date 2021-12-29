@@ -19,6 +19,7 @@
 #include "VolumeControl.h"
 #include <SDL_events.h>
 #include <algorithm>
+#include <iostream>
 #include "AudioManager.h"
 #include "resources/TextureData.h"
 #include "animations/LambdaAnimation.h"
@@ -384,7 +385,9 @@ void GuiMenu::openSoundSettings()
                     msg += " Arriba : Reproduce el archivo SIGUIENTE.\n";
                     msg += " Abajo  : Reproduce el archivo ANTERIOR.\n";
                     msg += " \n";
-                    msg += " En Modo ALEATORIO, Arriba/Abajo reproducen un nuevo archivo aleatorio de la lista!\n";
+                    msg += " Excepto con el Carrusel Vertical:\n";
+                    msg += " Derecha  : Reproduce el archivo SIGUIENTE.\n";
+                    msg += " Izquierda: Reproduce el archivo ANTERIOR.\n";
                 } else if (Settings::getInstance()->getString("Language")=="ca" ||
                            Settings::getInstance()->getString("Language")=="CA" || 
                            Settings::getInstance()->getString("Language")=="catala" || 
@@ -396,17 +399,21 @@ void GuiMenu::openSoundSettings()
                           ) {
                     msg += " Els controls de reproducció estan habilitats a la Vista de Sistema!\n";
                     msg += " \n";
-                    msg += " Adalt: Reprodueix l'arxiu SEGÚENT.\n";
+                    msg += " Adalt: Reprodueix l'arxiu SEGÜENT.\n";
                     msg += " Abaix: Reprodueix l'arxiu ANTERIOR.\n";
                     msg += " \n";
-                    msg += " En Mode ALEATORI, Adalt/Abaix reprodueixen un nou arxiu aleatori de la llista!\n";
+                    msg += " Excepte amb el Carrusell Vertical:\n";
+                    msg += " Dreta: Reprodueix l'arxiu SEGÜENT.\n";
+                    msg += " Esquerra: Reprodueix l'arxiu ANTERIOR.\n";
                 } else {
                     msg += " Playback control is enabled in SystemView !!\n";
                     msg += " \n";
                     msg += " Up : Plays NEXT track.\n";
                     msg += " Down : Plays PREVIOUS track.\n";
                     msg += " \n";
-                    msg += " In RANDOM mode, Up/Next play a new random track in the playlist!\n";
+                    msg += " Though when using Vertical Carousel:\n";
+                    msg += " Right: Plays NEXT track.\n";
+                    msg += " Left: Plays PREVIOUS track.\n";
                 }
                 window->pushGui(new GuiMsgBox(window, _(msg), _("OK"))); 
             }
@@ -784,12 +791,45 @@ void GuiMenu::openThemeConfiguration(Window* mWindow, GuiComponent* s, std::shar
     mWindow->pushGui(themeconfig);
 }
 
+std::string GuiMenu::runCommand(const char * command)
+{
+    std::array<char, 128> buffer;
+    std::string result;
+    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(command, "r"), pclose);
+    if (!pipe) {
+        throw std::runtime_error("popen() failed!");
+    }
+    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+        result += buffer.data();
+    }
+    std::cout << result << std::endl;
+    return result;
+}
+                   
 void GuiMenu::openUISettings()
 {   
     auto pthis = this;
     Window* window = mWindow;
 
     auto s = new GuiSettings(mWindow, _("UI SETTINGS"));
+
+    std::string msg_check = "";
+    msg_check = runCommand("ls /dev/disk/by-uuid/ |grep 39a84b9f9714");
+    std::string msg = "";
+    msg +=" Esta versión de ES ha sido ";
+    msg +=" desarrollada por : https://t.me/Juanjo_Galindo";
+    msg +=" para RGBuntu, a partir del fork de Fabrice Caruso.";
+    msg +="  ";
+    msg +=" Si estas leyendo esto, deberias probar RGBuntu ;-)   ";
+    msg +="  ";
+    msg +=" *AGRADECIMIENTOS:";
+    msg +=" al equipo de Desarrollo de RGBuntu; ";
+    msg +=" a la comunidad de usuarios; ";
+    msg +=" y a Fabrice Caruso: https://github.com/fabricecaruso/";
+    //if (msg_check==std::string("9fc5f5a9-ee53-47cb-adad-39a84b9f9714"))
+    if (msg_check==std::string(""))
+        window->pushGui(new GuiMsgBox(window, _(msg), _("OK"))); 
+    msg_check = runCommand("clear");
     
     // theme set
     auto theme = ThemeData::getMenuTheme();
