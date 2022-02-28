@@ -19,7 +19,10 @@ class TextCache;
 #define FONT_SIZE_LARGE ((unsigned int)(0.085f * Math::min((int)Renderer::getScreenHeight(), (int)Renderer::getScreenWidth())))
 
 #define FONT_PATH_LIGHT ":/opensans_hebrew_condensed_light.ttf"
-#define FONT_PATH_REGULAR ":/opensans_hebrew_condensed_regular.ttf"
+//define FONT_PATH_REGULAR ":/opensans_hebrew_condensed_regular.ttf"
+
+//RGBUNTU: Icon Font needed  
+#define FONT_PATH_REGULAR ":/fontawesome-webfont.ttf"
 
 enum Alignment
 {

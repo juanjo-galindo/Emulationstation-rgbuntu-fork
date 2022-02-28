@@ -399,13 +399,13 @@ void processAudioTitles(Window* window)
             //Juanjo:  Original
 		    std::string songName = AudioManager::getInstance()->popSongName();
 		    if (!songName.empty())
-		    	window->displayNotificationMessage(songName);
+		    	window->displayNotificationMessage(_U("\uF001  ") + songName);
         }
         if (Settings::getInstance()->getString("MusicInfoModes") == "Path") {
             //Juanjo:  Test purposes
 		    std::string musicPath= AudioManager::getInstance()->popMusicPath();
 		    if (!musicPath.empty())
-		    	window->displayNotificationMessage(musicPath);
+		    	window->displayNotificationMessage(_U("\uF001  ") + musicPath);
 	    }
         //if (Settings::getInstance()->getString("MusicInfoModes") == "TEST") {
 		//    std::string testName = AudioManager::getInstance()->popTestString();
