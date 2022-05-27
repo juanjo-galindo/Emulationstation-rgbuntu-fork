@@ -5,6 +5,7 @@
 #include <map>
 #include <memory>
 #include "SDL_mixer.h"
+#include <string>
 
 class ThemeData;
 

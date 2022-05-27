@@ -3,6 +3,7 @@
 #define ES_APP_GAME_LIST_H
 
 #include <unordered_map>
+#include <string>
 
 class SystemData;
 class FileData;
