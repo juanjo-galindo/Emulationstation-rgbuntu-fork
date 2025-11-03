@@ -21,16 +21,21 @@ GuiSlideshowScreensaverOptions::GuiSlideshowScreensaverOptions(Window* window, c
 		PowerSaver::updateTimeouts();
 	});
 	
-	// SHOW GAME NAME
-	auto ss_controls = std::make_shared<SwitchComponent>(mWindow);
-	ss_controls->setState(Settings::getInstance()->getBool("SlideshowScreenSaverGameName"));
-	addWithLabel(row, _("SHOW GAME INFO"), ss_controls);
-	addSaveFunc([ss_controls] { Settings::getInstance()->setBool("SlideshowScreenSaverGameName", ss_controls->getState()); });
+  //auto ss_info = std::make_shared<SwitchComponent>(mWindow);
+  //ss_info->setState(Settings::getInstance()->getBool("ScreenSaverInfo"));
+  //addWithLabel(row, _("SHOW GAME INFO"), ss_info);
+  //addSaveFunc([ss_info] { Settings::getInstance()->setBool("ScreenSaverInfo", ss_info->getState()); });
 
 	auto marquee_screensaver = std::make_shared<SwitchComponent>(mWindow);
 	marquee_screensaver->setState(Settings::getInstance()->getBool("ScreenSaverMarquee"));
 	addWithLabel(row, _("USE MARQUEE AS GAME INFO"), marquee_screensaver);
 	addSaveFunc([marquee_screensaver] { Settings::getInstance()->setBool("ScreenSaverMarquee", marquee_screensaver->getState()); });
+
+	auto system_logo_screensaver = std::make_shared<SwitchComponent>(mWindow);
+	system_logo_screensaver->setState(Settings::getInstance()->getBool("ScreenSaverSystemLogo"));
+	addWithLabel(row, _("USE LOGO AS SYSTEM INFO"), system_logo_screensaver);
+	addSaveFunc([system_logo_screensaver] { Settings::getInstance()->setBool("ScreenSaverSystemLogo", system_logo_screensaver->getState()); });
+
 	/*
 	auto decoration_screensaver = std::make_shared<SwitchComponent>(mWindow);
 	decoration_screensaver->setState(Settings::getInstance()->getBool("ScreenSaverDecoration"));

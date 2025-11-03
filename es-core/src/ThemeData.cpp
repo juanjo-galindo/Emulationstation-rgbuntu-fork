@@ -709,6 +709,28 @@ bool ThemeData::parseFilterAttributes(const pugi::xml_node& node)
 			return false;
 	}
 
+	if (node.attribute("ifSysAniWall"))
+	{
+		const std::string sysAniWallAttr = node.attribute("ifSysAniWall").as_string();
+		bool sysAniWall = Settings::getInstance()->getBool("ShowSysAniWall");
+
+		if (!sysAniWall && sysAniWallAttr == "true")
+			return false;
+		else if (sysAniWall && sysAniWallAttr == "false")
+			return false;
+	}
+
+	if (node.attribute("ifSysAniMini"))
+	{
+		const std::string sysAniMiniAttr = node.attribute("ifSysAniMini").as_string();
+		bool sysAniMini = Settings::getInstance()->getBool("ShowSysAniMini");
+
+		if (!sysAniMini && sysAniMiniAttr == "true")
+			return false;
+		else if (sysAniMini && sysAniMiniAttr == "false")
+			return false;
+	}
+
 	return true;
 }
 

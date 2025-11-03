@@ -67,7 +67,7 @@ namespace Renderer
 
 	static bool createWindow()
 	{
-		LOG(LogInfo) << "Creating window...";
+		LOG(LogInfo) << "Creating window... ...";
 
 		if(SDL_Init(SDL_INIT_VIDEO) != 0)
 		{
@@ -101,6 +101,19 @@ namespace Renderer
 		screenRotate  = Settings::getInstance()->getInt("ScreenRotate")  ? Settings::getInstance()->getInt("ScreenRotate")  : 0;
 
 		int monitorId = Settings::getInstance()->getInt("MonitorID");
+
+LOG(LogInfo) << "Check this out RGBUNTU:";
+int ndisplays = SDL_GetNumVideoDisplays();
+LOG(LogInfo) << "SDL displays = " + std::to_string(ndisplays) ; 
+LOG(LogInfo) << "SDL display w = " + std::to_string(dispMode.w) ; 
+LOG(LogInfo) << "SDL display h = " + std::to_string(dispMode.h) ; 
+LOG(LogInfo) << "SDL display windowWidth = " + std::to_string(windowWidth ) ; 
+LOG(LogInfo) << "SDL display windowHeight= " + std::to_string(windowHeight) ; 
+LOG(LogInfo) << "SDL display screenWidth = " + std::to_string(screenWidth ) ; 
+LOG(LogInfo) << "SDL display screenHeight= " + std::to_string(screenHeight) ; 
+LOG(LogInfo) << "SDL display screenOffsetX= " + std::to_string(screenOffsetX) ; 
+LOG(LogInfo) << "SDL display screenOffsetY= " + std::to_string(screenOffsetY) ; 
+
 		if (monitorId >= 0 && sdlWindowPosition == Vector2i(SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED))
 		{
 			int displays = SDL_GetNumVideoDisplays();

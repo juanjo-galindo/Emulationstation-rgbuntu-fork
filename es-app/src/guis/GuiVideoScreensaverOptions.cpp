@@ -60,6 +60,11 @@ GuiVideoScreensaverOptions::GuiVideoScreensaverOptions(Window* window, const cha
 		marquee_screensaver->setState(Settings::getInstance()->getBool("ScreenSaverMarquee"));
 		addWithLabel(_("USE MARQUEE AS GAME INFO"), marquee_screensaver);
 		addSaveFunc([marquee_screensaver] { Settings::getInstance()->setBool("ScreenSaverMarquee", marquee_screensaver->getState()); });
+
+		auto system_logo_screensaver = std::make_shared<SwitchComponent>(mWindow);
+		system_logo_screensaver->setState(Settings::getInstance()->getBool("ScreenSaverSystemLogo"));
+		addWithLabel(_("USE LOGO AS SYSTEM INFO"), system_logo_screensaver);
+		addSaveFunc([system_logo_screensaver] { Settings::getInstance()->setBool("ScreenSaverSystemLogo", system_logo_screensaver->getState()); });
 /*
 		auto decoration_screensaver = std::make_shared<SwitchComponent>(mWindow);
 		decoration_screensaver->setState(Settings::getInstance()->getBool("ScreenSaverDecoration"));

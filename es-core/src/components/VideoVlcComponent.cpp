@@ -645,6 +645,8 @@ void VideoVlcComponent::applyTheme(const std::shared_ptr<ThemeData>& theme, cons
 			mEffect = VideoVlcFlags::VideoVlcEffect::SIZE;
 		else if (!(elem->get<std::string>("effect").compare("bump")))
 			mEffect = VideoVlcFlags::VideoVlcEffect::BUMP;
+		else if (!(elem->get<std::string>("effect").compare("none")))
+			mEffect = VideoVlcFlags::VideoVlcEffect::NONE;
 		else
 			mEffect = VideoVlcFlags::VideoVlcEffect::NONE;
 	}

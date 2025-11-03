@@ -3,6 +3,7 @@
 #define ES_APP_FILE_FILTER_INDEX_H
 
 #include <map>
+#include <string>
 #include <vector>
 
 class FileData;

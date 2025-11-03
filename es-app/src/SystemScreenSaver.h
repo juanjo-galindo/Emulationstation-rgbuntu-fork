@@ -25,6 +25,7 @@ public:
 
 protected:
 	ImageComponent*		mMarquee;
+	ImageComponent*		mSystemLogo;
 	TextComponent*		mLabelGame;
 	TextComponent*		mLabelSystem;
 

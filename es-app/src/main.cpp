@@ -494,12 +494,16 @@ int main(int argc, char* argv[])
 	atexit(&onExit);
 
 	Window window;
-	SystemScreenSaver screensaver(&window);
+  //SystemScreenSaver screensaver(&window);
 	PowerSaver::init();
 	ViewController::init(&window);
 	CollectionSystemManager::init(&window);
 	MameNames::init();
 	window.pushGui(ViewController::get());
+
+	SystemScreenSaver screensaver(&window);
+    //AudioManager::getInstance()->themeChanged(ViewController::get()->getState().getSystem()->getTheme(), false); 
+    //const std::shared_ptr<ThemeData>& theme
 
 	TextureData::OPTIMIZEVRAM = Settings::getInstance()->getBool("OptimizeVRAM");
 	GuiComponent::ALLOWANIMATIONS = Settings::getInstance()->getString("TransitionStyle") != "instant";

@@ -2,6 +2,7 @@
 #ifndef ES_APP_GAME_LIST_H
 #define ES_APP_GAME_LIST_H
 
+#include <string>
 #include <unordered_map>
 
 class SystemData;

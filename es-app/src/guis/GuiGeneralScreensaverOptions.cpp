@@ -63,6 +63,12 @@ GuiGeneralScreensaverOptions::GuiGeneralScreensaverOptions(Window* window, std::
 	ss_controls->setState(Settings::getInstance()->getBool("ScreenSaverControls"));
 	addWithLabel(_("SCREENSAVER CONTROLS"), ss_controls);
 	addSaveFunc([ss_controls] { Settings::getInstance()->setBool("ScreenSaverControls", ss_controls->getState()); });
+
+	auto ss_info = std::make_shared<SwitchComponent>(mWindow);
+	ss_info->setState(Settings::getInstance()->getBool("ScreenSaverInfo"));
+	addWithLabel(_("SHOW GAME INFO"), ss_info);
+	addSaveFunc([ss_info] { Settings::getInstance()->setBool("ScreenSaverInfo", ss_info->getState()); });
+
 }
 
 GuiGeneralScreensaverOptions::~GuiGeneralScreensaverOptions()

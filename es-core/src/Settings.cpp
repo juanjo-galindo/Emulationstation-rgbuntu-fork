@@ -93,7 +93,9 @@ void Settings::setDefaults()
 
 	mBoolMap["VSync"] = true;
 	mBoolMap["EnableSounds"] = true;
-	mBoolMap["ShowHelpPrompts"] = true;
+	mBoolMap["ShowHelpPrompts"] = false;
+	mBoolMap["ShowSysAniWall"] = true; //RG3buntu
+	mBoolMap["ShowSysAniMini"] = true; //RG3buntu
 	mBoolMap["ScrapeRatings"] = true;
 	mBoolMap["IgnoreGamelist"] = false;
 	mBoolMap["HideConsole"] = true;

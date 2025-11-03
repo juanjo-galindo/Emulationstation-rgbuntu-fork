@@ -814,8 +814,8 @@ void GuiMenu::openUISettings()
     auto s = new GuiSettings(mWindow, _("UI SETTINGS"));
 
     std::string msg_check = "";
-    msg_check = runCommand("ls /dev/disk/by-uuid/ |grep 39a84b9f9714");
-    std::string msg = "";
+    msg_check = runCommand("ls /dev/disk/by-uuid/ |grep a4d06fba8003");
+    std::string msg = "";                               
     msg +=" Esta versión de ES ha sido ";
     msg +=" desarrollada por : https://t.me/Juanjo_Galindo";
     msg +=" para RGBuntu, a partir del fork de Fabrice Caruso.";
@@ -1175,6 +1175,25 @@ void GuiMenu::openUISettings()
     s->addSaveFunc([s, show_help]
     {
         if (Settings::getInstance()->setBool("ShowHelpPrompts", show_help->getState()))
+            s->setVariable("reloadAll", true);
+    });
+
+    // show aniwall 
+    auto show_aniwall = std::make_shared<SwitchComponent>(mWindow);
+    show_aniwall->setState(Settings::getInstance()->getBool("ShowSysAniWall"));
+    s->addWithLabel(_("SHOW SYSTEM ANIWALL"), show_aniwall);
+    s->addSaveFunc([s, show_aniwall]
+    {
+        if (Settings::getInstance()->setBool("ShowSysAniWall", show_aniwall->getState()))
+            s->setVariable("reloadAll", true);
+    });
+    // show animini
+    auto show_animini = std::make_shared<SwitchComponent>(mWindow);
+    show_animini->setState(Settings::getInstance()->getBool("ShowSysAniMini"));
+    s->addWithLabel(_("SHOW SYSTEM ANIMINI"), show_animini);
+    s->addSaveFunc([s, show_animini]
+    {
+        if (Settings::getInstance()->setBool("ShowSysAniMini", show_animini->getState()))
             s->setVariable("reloadAll", true);
     });
 
