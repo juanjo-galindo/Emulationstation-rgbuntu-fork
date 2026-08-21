@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include "SDL_mixer.h"
+#include <string>
 
 class ThemeData;
 

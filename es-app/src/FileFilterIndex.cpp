@@ -5,6 +5,7 @@
 #include "FileData.h"
 #include "Log.h"
 #include "Settings.h"
+#include <string>
 
 #define UNKNOWN_LABEL "UNKNOWN"
 #define INCLUDE_UNKNOWN false;
